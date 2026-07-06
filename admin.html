@@ -42,7 +42,6 @@
     <div class="container">
         <h1>מערכת ניהול תוכן ל-2580</h1>
         
-        <!-- תיבת סטטוס ופידבק -->
         <div id="status-box" class="status"></div>
 
         <div class="row">
@@ -117,10 +116,21 @@
             loadFromGitHub();
         });
 
+        // פונקציית חילוץ נתיב חכמה לעקיפת בעיית התיקיות והמטמון
+        function getDataUrl() {
+            const origin = window.location.origin;
+            const pathname = window.location.pathname;
+            if (window.location.hostname.endsWith('github.io')) {
+                const repoName = pathname.split('/')[1];
+                return `${origin}/${repoName}/data.json?t=${Date.now()}`;
+            }
+            return `data.json?t=${Date.now()}`;
+        }
+
         async function loadFromGitHub() {
             showStatus("טוען נתונים נוכחיים מ-GitHub...", "loading");
             try {
-                const res = await fetch('data.json?t=' + Date.now());
+                const res = await fetch(getDataUrl());
                 if (!res.ok) throw new Error("לא ניתן לקרוא את קובץ הנתונים");
                 siteData = await res.json();
                 renderActiveCategory();
@@ -214,7 +224,6 @@
             localStorage.setItem('admin_repo', repo);
             localStorage.setItem('admin_token', token);
 
-            // עדכון חזותי שהשמירה התחילה
             saveBtn.disabled = true;
             addBtn.disabled = true;
             saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> שומר שינויים...';
@@ -251,7 +260,6 @@
                 console.error(err);
                 showStatus("חלה שגיאה בתהליך השמירה. ודאו שאתם מריצים את האתר דרך חיבור מאובטח (HTTPS) ב-GitHub Pages ולא מקומית.", "error");
             } finally {
-                // החזרת הכפתורים למצב פעיל
                 saveBtn.disabled = false;
                 addBtn.disabled = false;
                 saveBtn.innerHTML = '<i class="fas fa-save"></i> שמור שינויים באתר';
@@ -262,7 +270,7 @@
             const box = document.getElementById('status-box');
             box.className = "status " + className;
             box.innerHTML = text;
-            box.style.display = 'block'; // פותר את באג ה-Inline הנסתר ומכריח הצגה
+            box.style.display = 'block';
         }
 
         function hideStatus() {
