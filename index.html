@@ -111,7 +111,6 @@
     </div>
     <button id="dark-mode-toggle" title="שנה מצב תצוגה"><i class="fas fa-moon"></i></button>
     <script>
-        // Dark Mode Toggle
         const darkModeBtn = document.getElementById('dark-mode-toggle');
         const darkModeIcon = darkModeBtn.querySelector('i');
         const docElement = document.documentElement;
@@ -119,7 +118,6 @@
         darkModeBtn.addEventListener('click', () => { docElement.classList.toggle('dark-mode'); localStorage.setItem('theme', docElement.classList.contains('dark-mode') ? 'dark' : 'light'); setDarkModeIcon(); });
         setDarkModeIcon();
 
-        // Reusable function for Grid/List View Toggle
         function setupViewToggle(gridBtnId, listBtnId, containerId, storageKey) {
             const gridViewBtn = document.getElementById(gridBtnId);
             const listViewBtn = document.getElementById(listBtnId);
@@ -151,15 +149,24 @@
             });
         }
         
-        // Initialize toggles for each section on the home page
         setupViewToggle('grid-view-btn-1', 'list-view-btn-1', 'guides-container', 'viewModeGuides');
         setupViewToggle('grid-view-btn-2', 'list-view-btn-2', 'creations-container', 'viewModeCreations');
         setupViewToggle('grid-view-btn-3', 'list-view-btn-3', 'shares-container', 'viewModeShares');
 
-        // Dynamic Loading Logic
+        // פונקציית חילוץ נתיב חכמה לעקיפת בעיית התיקיות והמטמון
+        function getDataUrl() {
+            const origin = window.location.origin;
+            const pathname = window.location.pathname;
+            if (window.location.hostname.endsWith('github.io')) {
+                const repoName = pathname.split('/')[1];
+                return `${origin}/${repoName}/data.json?t=${Date.now()}`;
+            }
+            return `data.json?t=${Date.now()}`;
+        }
+
         async function loadData() {
             try {
-                const response = await fetch('data.json');
+                const response = await fetch(getDataUrl());
                 const data = await response.json();
                 
                 renderSection('guides-container', data.guides, 4);
