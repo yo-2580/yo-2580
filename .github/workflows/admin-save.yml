@@ -1,0 +1,61 @@
+name: Save Admin Changes
+on:
+  workflow_dispatch:
+    inputs:
+      payload:
+        description: 'JSON payload with updated data'
+        required: true
+      signature:
+        description: 'HMAC signature for authentication'
+        required: true
+
+jobs:
+  save:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Verify Signature and Write Data
+        env:
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+          PAYLOAD: ${{ github.event.inputs.payload }}
+          SIGNATURE: ${{ github.event.inputs.signature }}
+        run: |
+          node -e "
+          const crypto = require('crypto');
+          const fs = require('fs');
+
+          const payload = process.env.PAYLOAD;
+          const signature = process.env.SIGNATURE;
+          const secret = process.env.ADMIN_PASSWORD;
+
+          if (!secret) {
+            console.error('Error: ADMIN_PASSWORD secret is not defined in GitHub Secrets.');
+            process.exit(1);
+          }
+
+          const expectedSignature = crypto.createHmac('sha256', secret).update(payload).digest('hex');
+
+          if (signature !== expectedSignature) {
+            console.error('Validation failed: Invalid signature!');
+            process.exit(1);
+          }
+
+          try {
+            const parsed = JSON.parse(payload);
+            fs.writeFileSync('data.json', JSON.stringify(parsed, null, 2));
+            console.log('Successfully validated and updated data.json');
+          } catch (e) {
+            console.error('Error parsing payload JSON:', e.message);
+            process.exit(1);
+          }
+          "
+
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data.json
+          git diff-index --quiet HEAD || git commit -m "Update data.json via Admin Panel"
+          git push
