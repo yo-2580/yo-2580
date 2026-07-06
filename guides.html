@@ -71,7 +71,6 @@
     </div>
     <button id="dark-mode-toggle" title="שנה מצב תצוגה"><i class="fas fa-moon"></i></button>
     <script>
-        // Dark Mode Toggle
         const darkModeBtn = document.getElementById('dark-mode-toggle');
         const darkModeIcon = darkModeBtn.querySelector('i');
         const docElement = document.documentElement;
@@ -79,7 +78,6 @@
         darkModeBtn.addEventListener('click', () => { docElement.classList.toggle('dark-mode'); localStorage.setItem('theme', docElement.classList.contains('dark-mode') ? 'dark' : 'light'); setDarkModeIcon(); });
         setDarkModeIcon();
 
-        // Grid/List View Toggle
         const gridViewBtn = document.getElementById('grid-view-btn');
         const listViewBtn = document.getElementById('list-view-btn');
         const container = document.getElementById('links-container');
@@ -106,10 +104,20 @@
             localStorage.setItem('viewMode', 'list');
         });
 
-        // Dynamic Loading Logic
+        // פונקציית חילוץ נתיב חכמה לעקיפת בעיית התיקיות והמטמון
+        function getDataUrl() {
+            const origin = window.location.origin;
+            const pathname = window.location.pathname;
+            if (window.location.hostname.endsWith('github.io')) {
+                const repoName = pathname.split('/')[1];
+                return `${origin}/${repoName}/data.json?t=${Date.now()}`;
+            }
+            return `data.json?t=${Date.now()}`;
+        }
+
         async function loadData() {
             try {
-                const response = await fetch('data.json');
+                const response = await fetch(getDataUrl());
                 const data = await response.json();
                 
                 container.innerHTML = '';
