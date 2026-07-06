@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ממשק ניהול - 2580</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script>
+        (function() { const theme = localStorage.getItem('theme'); if (theme === 'dark') { document.documentElement.classList.add('dark-mode'); } })();
+    </script>
+    <style>
+        :root { --bg-color: #f0f2f5; --text-color: #333; --container-bg: #fff; --nav-bg: #fff; --separator-color: #e0e0e0; --active-nav-color: #007bff; --fab-bg: #fff; --fab-color: #333; --input-bg: #fff; --input-border: #ccc;}
+        .dark-mode { --bg-color: #121212; --text-color: #e0e0e0; --container-bg: #1e1e1e; --nav-bg: #252525; --separator-color: #444; --active-nav-color: #58a6ff; --fab-bg: #2c2c2c; --fab-color: #e0e0e0; --input-bg: #2d2d2d; --input-border: #555;}
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 100px 20px 60px; display: flex; justify-content: center; align-items: flex-start; text-align: right; transition: background-color 0.3s, color 0.3s; }
+        .container { position: relative; background-color: var(--container-bg); padding: 45px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); max-width: 780px; width: 100%; transition: background-color 0.3s; }
+        h1 { color: var(--active-nav-color); font-size: 2em; margin-top: 0; border-bottom: 2px solid var(--active-nav-color); padding-bottom: 10px; }
+        label { display: block; font-weight: bold; margin-top: 15px; margin-bottom: 5px; }
+        input, select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--input-border); background-color: var(--input-bg); color: var(--text-color); box-sizing: border-box; font-size: 1em; }
+        .row { display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; }
+        .flex-grow { flex-grow: 1; min-width: 200px; }
+        .btn { background-color: var(--active-nav-color); color: #fff; border: none; padding: 12px 24px; border-radius: 25px; font-weight: bold; cursor: pointer; font-size: 1em; display: inline-flex; align-items: center; gap: 8px; transition: opacity 0.2s, transform 0.1s; }
+        .btn:hover { opacity: 0.9; }
+        .btn:active { transform: scale(0.98); }
+        .btn-danger { background-color: #dc3545; }
+        .btn-success { background-color: #28a745; }
+        .btn-secondary { background-color: #6c757d; }
+        .items-list { margin-top: 25px; border: 1px solid var(--separator-color); border-radius: 10px; padding: 15px; }
+        .item-row { display: flex; gap: 10px; align-items: center; border-bottom: 1px solid var(--separator-color); padding: 10px 0; }
+        .item-row:last-child { border-bottom: none; }
+        .item-row input { margin: 0; }
+        #dark-mode-toggle { position: fixed; top: 20px; left: 20px; z-index: 1001; width: 50px; height: 50px; border-radius: 50%; background-color: var(--fab-bg); color: var(--fab-color); border: 1px solid var(--separator-color); box-shadow: 0 4px 8px rgba(0,0,0,0.15); font-size: 1.2em; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background-color 0.3s, color 0.3s, transform 0.2s; }
+        #dark-mode-toggle:hover { transform: scale(1.1); }
+        .status { padding: 15px; border-radius: 8px; margin-top: 20px; display: none; font-weight: bold; }
+        .status.success { background-color: rgba(40, 167, 69, 0.2); color: #28a745; display: block; }
+        .status.error { background-color: rgba(220, 53, 69, 0.2); color: #dc3545; display: block; }
+        .status.loading { background-color: rgba(0, 123, 255, 0.2); color: #007bff; display: block; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>מערכת ניהול תוכן ל-2580</h1>
+        
+        <div class="row">
+            <div class="flex-grow">
+                <label for="gh-repo">מאגר ב-GitHub (מבנה: username/repo):</label>
+                <input type="text" id="gh-repo" placeholder="yo-2580/profile2580">
+            </div>
+            <div class="flex-grow">
+                <label for="gh-token">GitHub Personal Access Token (PAT):</label>
+                <input type="password" id="gh-token" placeholder="הזינו את הטוקן שייצרתם">
+            </div>
+            <div class="flex-grow">
+                <label for="admin-password">סיסמת ניהול (מכניסים ב-Secret במאגר):</label>
+                <input type="password" id="admin-password" placeholder="הזינו את הסיסמה">
+            </div>
+        </div>
+
+        <button class="btn btn-secondary" onclick="loadFromGitHub()"><i class="fas fa-sync"></i> טען נתונים מהמאגר</button>
+
+        <hr style="border: 0; height: 1px; background-color: var(--separator-color); margin: 30px 0;">
+
+        <label for="category-select">בחר קטגוריה לעריכה:</label>
+        <select id="category-select" onchange="renderActiveCategory()">
+            <option value="guides">מדריכים</option>
+            <option value="creations">יצירות</option>
+            <option value="shares">שיתופים</option>
+        </select>
+
+        <div class="items-list" id="items-list">
+            טוען נתונים...
+        </div>
+
+        <button class="btn btn-success" style="margin-top: 15px;" onclick="addItem()"><i class="fas fa-plus"></i> הוסף קישור חדש</button>
+        <button class="btn" style="margin-top: 15px; float: left;" onclick="saveChanges()"><i class="fas fa-save"></i> שמור שינויים באתר</button>
+
+        <div style="clear: both;"></div>
+        <div id="status-box" class="status"></div>
+    </div>
+
+    <button id="dark-mode-toggle" title="שנה מצב תצוגה"><i class="fas fa-moon"></i></button>
+
+    <script>
+        const darkModeBtn = document.getElementById('dark-mode-toggle');
+        const darkModeIcon = darkModeBtn.querySelector('i');
+        const docElement = document.documentElement;
+        function setDarkModeIcon() { if (docElement.classList.contains('dark-mode')) { darkModeIcon.classList.remove('fa-moon'); darkModeIcon.classList.add('fa-sun'); } else { darkModeIcon.classList.remove('fa-sun'); darkModeIcon.classList.add('fa-moon'); } }
+        darkModeBtn.addEventListener('click', () => { docElement.classList.toggle('dark-mode'); localStorage.setItem('theme', docElement.classList.contains('dark-mode') ? 'dark' : 'light'); setDarkModeIcon(); });
+        setDarkModeIcon();
+
+        let siteData = { guides: [], creations: [], shares: [] };
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const pathParts = window.location.pathname.split('/');
+            const repoInput = document.getElementById('gh-repo');
+            
+            if (window.location.hostname.endsWith('github.io')) {
+                const username = window.location.hostname.split('.')[0];
+                const repo = pathParts[1] || '';
+                repoInput.value = username + "/" + repo;
+            } else {
+                repoInput.value = localStorage.getItem('admin_repo') || '';
+            }
+
+            document.getElementById('gh-token').value = localStorage.getItem('admin_token') || '';
+            loadFromGitHub();
+        });
+
+        async function loadFromGitHub() {
+            showStatus("טוען נתונים מ-GitHub...", "loading");
+            try {
+                const res = await fetch('data.json?t=' + Date.now());
+                if (!res.ok) throw new Error("לא ניתן לקרוא את קובץ הנתונים");
+                siteData = await res.json();
+                renderActiveCategory();
+                showStatus("הנתונים נטענו בהצלחה!", "success");
+                setTimeout(hideStatus, 2000);
+            } catch (err) {
+                showStatus("לא ניתן לטעון נתונים. ודאו שקובץ data.json קיים במאגר.", "error");
+            }
+        }
+
+        function renderActiveCategory() {
+            const category = document.getElementById('category-select').value;
+            const container = document.getElementById('items-list');
+            container.innerHTML = '';
+
+            const list = siteData[category] || [];
+            if (list.length === 0) {
+                container.innerHTML = '<div>אין פריטים בקטגוריה זו. לחצו על "הוסף קישור חדש" למטה.</div>';
+                return;
+            }
+
+            list.forEach((item, index) => {
+                const row = document.createElement('div');
+                row.className = 'item-row';
+                row.innerHTML = `
+                    <div style="font-weight: bold; width: 30px;">#${list.length - index}</div>
+                    <div class="flex-grow row" style="margin: 0; width: 100%;">
+                        <input type="text" class="item-title flex-grow" value="${item.title}" placeholder="כותרת הקישור" onchange="updateItem(${index}, 'title', this.value)">
+                        <input type="text" class="item-url flex-grow" value="${item.url}" placeholder="כתובת הקישור (URL)" onchange="updateItem(${index}, 'url', this.value)">
+                    </div>
+                    <button class="btn btn-danger" onclick="deleteItem(${index})" title="מחק"><i class="fas fa-trash"></i></button>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        function updateItem(index, field, value) {
+            const category = document.getElementById('category-select').value;
+            siteData[category][index][field] = value;
+        }
+
+        function deleteItem(index) {
+            const category = document.getElementById('category-select').value;
+            if (confirm("האם למחוק את פריט זה?")) {
+                siteData[category].splice(index, 1);
+                renderActiveCategory();
+            }
+        }
+
+        function addItem() {
+            const category = document.getElementById('category-select').value;
+            if (!siteData[category]) siteData[category] = [];
+            siteData[category].unshift({ title: '', url: '' });
+            renderActiveCategory();
+        }
+
+        async function calculateHMAC(keyStr, messageStr) {
+            const encoder = new TextEncoder();
+            const keyData = encoder.encode(keyStr);
+            const messageData = encoder.encode(messageStr);
+            
+            const key = await crypto.subtle.importKey(
+                "raw",
+                keyData,
+                { name: "HMAC", hash: { name: "SHA-256" } },
+                false,
+                ["sign"]
+            );
+            
+            const signatureBuffer = await crypto.subtle.sign("HMAC", key, messageData);
+            return Array.from(new Uint8Array(signatureBuffer))
+                .map(b => b.toString(16).padStart(2, "0"))
+                .join("");
+        }
+
+        async function saveChanges() {
+            const repo = document.getElementById('gh-repo').value;
+            const token = document.getElementById('gh-token').value;
+            const password = document.getElementById('admin-password').value;
+
+            if (!repo || !token || !password) {
+                showStatus("חובה להזין: מאגר, טוקן וסיסמה כדי לשמור שינויים.", "error");
+                return;
+            }
+
+            localStorage.setItem('admin_repo', repo);
+            localStorage.setItem('admin_token', token);
+
+            showStatus("מחשב חתימת אבטחה ושולח ל-GitHub...", "loading");
+
+            try {
+                const payload = JSON.stringify(siteData);
+                const signature = await calculateHMAC(password, payload);
+
+                const response = await fetch(`https://api.github.com/repos/${repo}/actions/workflows/admin-save.yml/dispatches`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Accept': 'application/vnd.github+json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        ref: 'main',
+                        inputs: {
+                            payload: payload,
+                            signature: signature
+                        }
+                    })
+                });
+
+                if (response.status === 204) {
+                    showStatus("הבקשה נשלחה בהצלחה! השרת של GitHub מעבד את השינויים כעת. האתר יתעדכן תוך כדקה.", "success");
+                } else {
+                    const errText = await response.text();
+                    showStatus(`שגיאה בשליחת הבקשה (${response.status}): ${errText || "ודאו שהטוקן והגדרות המאגר נכונים."}`, "error");
+                }
+            } catch (err) {
+                console.error(err);
+                showStatus("חלה שגיאה בתהליך השמירה.", "error");
+            }
+        }
+
+        function showStatus(text, className) {
+            const box = document.getElementById('status-box');
+            box.className = "status " + className;
+            box.innerHTML = text;
+        }
+
+        function hideStatus() {
+            document.getElementById('status-box').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

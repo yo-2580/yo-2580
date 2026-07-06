@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>המדריכים של 2580</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script>
+        (function() { const theme = localStorage.getItem('theme'); if (theme === 'dark') { document.documentElement.classList.add('dark-mode'); } })();
+    </script>
+    <style>
+        :root { --bg-color: #f0f2f5; --text-color: #333; --container-bg: #fff; --nav-bg: #fff; --link-card-bg: #f8f9fa; --link-card-border: #ddd; --h1-color: #0056b3; --h2-color: #555; --h3-color: #333; --separator-color: #e0e0e0; --active-nav-color: #007bff; --nav-link-color: #555; --fab-bg: #fff; --fab-color: #333;}
+        .dark-mode { --bg-color: #121212; --text-color: #e0e0e0; --container-bg: #1e1e1e; --nav-bg: #252525; --link-card-bg: #2c2c2c; --link-card-border: #444; --h1-color: #58a6ff; --h2-color: #b0b0b0; --h3-color: #e0e0e0; --separator-color: #444; --active-nav-color: #58a6ff; --nav-link-color: #ccc; --fab-bg: #2c2c2c; --fab-color: #e0e0e0;}
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 100px 20px 60px; display: flex; justify-content: center; align-items: flex-start; text-align: center; padding-top: 160px; transition: background-color 0.3s, color 0.3s; }
+        .main-nav { background-color: var(--nav-bg); box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: fixed; top: 0; left: 0; right: 0; z-index: 1000; transition: background-color 0.3s; }
+        .main-nav ul { margin: 0; padding: 0 10px; list-style: none; display: flex; justify-content: center; align-items: center; }
+        .main-nav a { display: block; padding: 20px 25px; text-decoration: none; color: var(--nav-link-color); font-weight: bold; transition: color 0.2s, border-color 0.2s; border-bottom: 3px solid transparent; }
+        .main-nav a:hover { color: var(--active-nav-color); }
+        .main-nav a.active { color: var(--active-nav-color); border-bottom-color: var(--active-nav-color); }
+        #dark-mode-toggle { position: fixed; top: 20px; left: 20px; z-index: 1001; width: 50px; height: 50px; border-radius: 50%; background-color: var(--fab-bg); color: var(--fab-color); border: 1px solid var(--separator-color); box-shadow: 0 4px 8px rgba(0,0,0,0.15); font-size: 1.2em; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background-color 0.3s, color 0.3s, transform 0.2s; }
+        #dark-mode-toggle:hover { transform: scale(1.1); }
+        .container { position: relative; background-color: var(--container-bg); padding: 80px 45px 45px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); max-width: 780px; width: 100%; transition: background-color 0.3s; }
+        .profile-pic-link { line-height: 0; }
+        .profile-pic { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 5px solid var(--container-bg); box-shadow: 0 4px 10px rgba(0,0,0,0.15); position: absolute; top: -60px; left: 50%; transform: translateX(-50%); transition: border-color 0.3s; }
+        h1, h2 { display: none; }
+        h3 { color: var(--h3-color); font-size: 1.6em; margin: 0; font-weight: bold; }
+        .separator { border: 0; height: 1px; background-color: var(--separator-color); margin: 50px auto; width: 80%; transition: background-color 0.3s; }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-top: 0; margin-bottom: 20px; border-bottom: 2px solid var(--active-nav-color); padding-bottom: 8px; transition: border-color 0.3s; }
+        .view-toggle-btn { background: none; border: none; cursor: pointer; font-size: 1.5em; color: #aaa; padding: 5px 10px; transition: color 0.2s; }
+        .view-toggle-btn:hover { color: #555; }
+        .dark-mode .view-toggle-btn:hover { color: #fff; }
+        .view-toggle-btn.active { color: var(--active-nav-color); }
+        .links-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; }
+        .links-container.list-view { display: flex; flex-direction: column; gap: 15px; }
+        .content-link { display: flex; align-items: center; justify-content: flex-start; background-color: var(--link-card-bg); color: var(--text-color); padding: 15px 20px; text-decoration: none; border-radius: 8px; border: 1px solid var(--link-card-border); transition: all 0.2s ease-in-out; font-weight: 500; text-align: right; min-height: 60px; }
+        .content-link:hover { background-color: #e9ecef; border-color: var(--active-nav-color); color: #0056b3; transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .links-container.list-view .content-link { padding: 14px 20px; min-height: auto; font-size: 1.05em; }
+        .dark-mode .content-link:hover { background-color: #3a3a3a; color: #fff; }
+        .main-cta-btn { display: inline-block; background-color: #007bff; color: #ffffff; padding: 14px 30px; text-decoration: none; border-radius: 25px; font-weight: bold; transition: background-color 0.3s; font-size: 1.1em; }
+        .main-cta-btn:hover { background-color: #0056b3; }
+        footer { margin-top: 40px; font-size: 0.9em; color: #888; }
+        .loading-text { font-style: italic; color: #888; grid-column: 1 / -1; padding: 20px 0; }
+    </style>
+</head>
+<body>
+    <nav class="main-nav">
+        <ul>
+            <li><a href="index.html">דף הבית</a></li>
+            <li><a href="guides.html" class="active">מדריכים</a></li>
+            <li><a href="creations.html">יצירות</a></li>
+            <li><a href="shares.html">שיתופים</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <a href="index.html" class="profile-pic-link" title="חזרה לדף הבית">
+            <img src="2580.jpeg" alt="תמונת הפרופיל של 2580" class="profile-pic">
+        </a>
+        <div class="section-header">
+            <h3>כל המדריכים שלי</h3>
+            <div>
+                <button id="grid-view-btn" class="view-toggle-btn" title="תצוגת רשת"><i class="fas fa-th-large"></i></button>
+                <button id="list-view-btn" class="view-toggle-btn" title="תצוגת רשימה"><i class="fas fa-bars"></i></button>
+            </div>
+        </div>
+        <div class="links-container" id="links-container">
+            <div class="loading-text">טוען מדריכים...</div>
+        </div>
+        <hr class="separator">
+        <a href="https://mitmachim.top/user/2580" target="_blank" class="main-cta-btn">רוצים לקרוא עוד? בקרו בפרופיל שלי!</a>
+        <footer><p>&copy; 2025 | נוצר לצורך הדגמה ע"י ג'מיני עבור 2580</p></footer>
+    </div>
+    <button id="dark-mode-toggle" title="שנה מצב תצוגה"><i class="fas fa-moon"></i></button>
+    <script>
+        // Dark Mode Toggle
+        const darkModeBtn = document.getElementById('dark-mode-toggle');
+        const darkModeIcon = darkModeBtn.querySelector('i');
+        const docElement = document.documentElement;
+        function setDarkModeIcon() { if (docElement.classList.contains('dark-mode')) { darkModeIcon.classList.remove('fa-moon'); darkModeIcon.classList.add('fa-sun'); } else { darkModeIcon.classList.remove('fa-sun'); darkModeIcon.classList.add('fa-moon'); } }
+        darkModeBtn.addEventListener('click', () => { docElement.classList.toggle('dark-mode'); localStorage.setItem('theme', docElement.classList.contains('dark-mode') ? 'dark' : 'light'); setDarkModeIcon(); });
+        setDarkModeIcon();
+
+        // Grid/List View Toggle
+        const gridViewBtn = document.getElementById('grid-view-btn');
+        const listViewBtn = document.getElementById('list-view-btn');
+        const container = document.getElementById('links-container');
+        const savedView = localStorage.getItem('viewMode');
+
+        if (savedView === 'list') {
+            container.classList.add('list-view');
+            listViewBtn.classList.add('active');
+        } else {
+            gridViewBtn.classList.add('active');
+        }
+
+        gridViewBtn.addEventListener('click', () => {
+            container.classList.remove('list-view');
+            gridViewBtn.classList.add('active');
+            listViewBtn.classList.remove('active');
+            localStorage.setItem('viewMode', 'grid');
+        });
+
+        listViewBtn.addEventListener('click', () => {
+            container.classList.add('list-view');
+            listViewBtn.classList.add('active');
+            gridViewBtn.classList.remove('active');
+            localStorage.setItem('viewMode', 'list');
+        });
+
+        // Dynamic Loading Logic
+        async function loadData() {
+            try {
+                const response = await fetch('data.json');
+                const data = await response.json();
+                
+                container.innerHTML = '';
+                if (!data.guides || data.guides.length === 0) {
+                    container.innerHTML = '<div class="loading-text">אין מדריכים להצגה</div>';
+                    return;
+                }
+
+                data.guides.forEach(item => {
+                    const a = document.createElement('a');
+                    a.href = item.url;
+                    a.target = '_blank';
+                    a.rel = 'noopener noreferrer';
+                    a.className = 'content-link';
+                    a.textContent = item.title;
+                    container.appendChild(a);
+                });
+            } catch (error) {
+                console.error("שגיאה בטעינת הנתונים:", error);
+                document.querySelector('.loading-text').textContent = "שגיאה בטעינת הנתונים.";
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', loadData);
+    </script>
+</body>
+</html>
